@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import HomeScreen from "./screens/HomeScreen";
 import DetailScreen from "./screens/DetailScreen";
 import BookingScreen from "./screens/BookingScreen";
+import ApplySeller from "./screens/ApplySeller";
 import SignIn from "./screens/SignIn";
 import SignUp from "./screens/SignUp";
 
@@ -18,6 +19,7 @@ function App() {
             <Route path="/" element={<HomeScreen />} />
             <Route path="/details/:id" element={<DetailScreen />} />
             <Route path="/booking/:id" element={<BookingScreen />} />
+            <Route path="/apply-seller" element={<ApplySeller />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
           </Routes>

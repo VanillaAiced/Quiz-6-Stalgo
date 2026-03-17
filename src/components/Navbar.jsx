@@ -5,7 +5,7 @@ import "./Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const toggleDropdown = (dropdown) => {
@@ -122,7 +122,18 @@ function Navbar() {
         <div className="nav-auth">
           {isAuthenticated ? (
             <>
-              <span className="nav-link user-text">Logged In</span>
+              {user?.role === "user" && (
+                <Link to="/apply-seller" className="nav-link nav-link--seller">
+                  Become a Seller
+                </Link>
+              )}
+              {user?.role === "seller" && (
+                <span className="nav-link role-badge role-badge--seller">Seller</span>
+              )}
+              {user?.role === "admin" && (
+                <span className="nav-link role-badge role-badge--admin">Admin</span>
+              )}
+              <span className="nav-link user-text">{user?.first_name || "Logged In"}</span>
               <button onClick={handleLogout} className="nav-link logout-btn">
                 Log Out
               </button>
