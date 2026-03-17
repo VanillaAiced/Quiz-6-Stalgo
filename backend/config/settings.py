@@ -31,11 +31,11 @@ INSTALLED_APPS = [
     'corsheaders',
     
     # Local apps
-    'apps.users',
-    'apps.services',
-    'apps.bookings',
-    'apps.payments',
-    'apps.subscriptions',
+    'apps.users.apps.UsersConfig',
+    'apps.services.apps.ServicesConfig',
+    'apps.bookings.apps.BookingsConfig',
+    'apps.payments.apps.PaymentsConfig',
+    'apps.subscriptions.apps.SubscriptionsConfig',
 ]
 
 MIDDLEWARE = [

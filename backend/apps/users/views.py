@@ -2,6 +2,7 @@
 Views for User authentication and management
 """
 
+from django.utils.timezone import now
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
