@@ -1,0 +1,21 @@
+# Frontend Requirements
+# This is a React-based frontend application
+
+# System Requirements:
+# - Node.js (v14.0.0 or higher)
+# - npm (v6.0.0 or higher)
+
+# Dependencies (managed by package.json):
+# - react@^18.2.0
+# - react-dom@^18.2.0
+# - react-router-dom@^6.8.0
+# - react-scripts@5.0.1
+# - web-vitals@^2.1.4
+
+# Installation:
+# Run: npm install
+
+# Running the application:
+# Development: npm start
+# Build: npm build
+# Test: npm test
