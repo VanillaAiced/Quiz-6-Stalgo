@@ -8,9 +8,9 @@ const services = [
     description:
       "Split and window AC inspection, cooling issue diagnosis, and gas refill support.",
     rating: 4.8,
-    price: 1299,
+    price: 23,
     duration_of_service: "2-3 hours",
-    name_of_the_expert: "Rajesh Kumar",
+    name_of_the_expert: "Airel Jan Evangelista",
     sample_image:
       "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?auto=format&fit=crop&w=900&q=80",
   },
@@ -20,9 +20,9 @@ const services = [
     description:
       "Drum cleaning, noise troubleshooting, and repair for top-load and front-load units.",
     rating: 4.6,
-    price: 899,
+    price: 16,
     duration_of_service: "1-2 hours",
-    name_of_the_expert: "Priya Singh",
+    name_of_the_expert: "Airel Jan Evangelista",
     sample_image:
       "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?auto=format&fit=crop&w=900&q=80",
   },
@@ -32,9 +32,9 @@ const services = [
     description:
       "Compressor, cooling, and leakage checks with complete preventive maintenance.",
     rating: 4.7,
-    price: 1499,
+    price: 27,
     duration_of_service: "2-4 hours",
-    name_of_the_expert: "Amit Patel",
+    name_of_the_expert: "Airel Jan Evangelista",
     sample_image:
       "https://images.unsplash.com/photo-1584568694244-14fbdf83bd30?auto=format&fit=crop&w=900&q=80",
   },
@@ -44,9 +44,9 @@ const services = [
     description:
       "Element replacement, thermostat checks, and emergency no-hot-water support.",
     rating: 4.5,
-    price: 799,
+    price: 14,
     duration_of_service: "1-2 hours",
-    name_of_the_expert: "Vikram Sharma",
+    name_of_the_expert: "Airel Jan Evangelista",
     sample_image:
       "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=900&q=80",
   },

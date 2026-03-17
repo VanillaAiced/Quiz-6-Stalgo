@@ -13,8 +13,7 @@ function DetailScreen() {
     if (!isAuthenticated) {
       navigate("/signin");
     } else {
-      alert(`Service "${service.service_name}" booked successfully!`);
-      // Add actual booking logic here
+      navigate(`/booking/${service.id}`, { state: { service } });
     }
   };
 
@@ -59,7 +58,7 @@ function DetailScreen() {
           <div className="detail-info-grid">
             <div className="info-item">
               <label className="info-label">Price</label>
-              <p className="info-value">₹{service.price}</p>
+              <p className="info-value">${service.price}</p>
             </div>
 
             <div className="info-item">
