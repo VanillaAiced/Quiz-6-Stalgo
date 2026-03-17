@@ -43,6 +43,8 @@ function BookingScreen() {
   const service = location.state?.service;
   const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID || "sb";
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
+  const serviceAmount = Number(service?.price);
+  const hasValidAmount = Number.isFinite(serviceAmount) && serviceAmount > 0;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -111,6 +113,7 @@ function BookingScreen() {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep((s) => s + 1);
     } else {
+      setPaypalError("");
       // Show payment modal instead of alerting
       setShowPaymentModal(true);
     }
@@ -170,7 +173,7 @@ function BookingScreen() {
     }
 
     try {
-      await fetch(`${apiBaseUrl}/api/v1/orders/create/`, {
+      const response = await fetch(`${apiBaseUrl}/api/v1/orders/create/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,6 +185,11 @@ function BookingScreen() {
           price_paid: Number(service.price),
         }),
       });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        console.error("Order API rejected request:", data);
+      }
     } catch (error) {
       console.error("Order API write failed, kept local record.", error);
     }
@@ -194,6 +202,10 @@ function BookingScreen() {
       const details = await actions.order.capture();
       const paypalTransactionId = details?.id || data?.orderID || `TXN_${Date.now()}`;
 
+      if (details?.status && details.status !== "COMPLETED") {
+        throw new Error("Payment was not completed.");
+      }
+
       await createOrderRecord(paypalTransactionId, details);
 
       setPaidFor(true);
@@ -201,28 +213,39 @@ function BookingScreen() {
       setShowPaymentModal(false);
       navigate("/");
     } catch (error) {
-      setPaypalError("Payment capture failed. Please try again.");
+      setPaypalError(error?.message || "Payment capture failed. Please try again.");
     } finally {
       setIsProcessingPayment(false);
     }
   };
 
   const createPaypalOrder = (data, actions) => {
+    if (!hasValidAmount) {
+      setPaypalError("Invalid amount. Please check the selected service.");
+      return Promise.reject(new Error("Invalid service amount"));
+    }
+
     return actions.order.create({
       purchase_units: [
         {
           description: service.service_name,
           amount: {
             currency_code: "USD",
-            value: Number(service.price).toFixed(2),
+            value: serviceAmount.toFixed(2),
           },
         },
       ],
     });
   };
 
-  const handlePaypalError = () => {
-    setPaypalError("PayPal could not be initialized. Check your client ID and try again.");
+  const handlePaypalError = (error) => {
+    const message = error?.message || "PayPal could not be initialized. Check your client ID and try again.";
+    setPaypalError(message);
+    setIsProcessingPayment(false);
+  };
+
+  const handlePaypalCancel = () => {
+    setPaypalError("Payment was cancelled.");
     setIsProcessingPayment(false);
   };
 
@@ -521,7 +544,7 @@ function BookingScreen() {
 
               <div className="bk-payment-info">
                 <p className="bk-payment-label">Amount</p>
-                <p className="bk-payment-value bk-payment-amount">${service.price}</p>
+                <p className="bk-payment-value bk-payment-amount">${serviceAmount.toFixed(2)}</p>
               </div>
 
               <div className="bk-payment-info">
@@ -551,6 +574,7 @@ function BookingScreen() {
                     "client-id": paypalClientId,
                     currency: "USD",
                     intent: "capture",
+                    components: "buttons",
                   }}
                 >
                   <PayPalButtons
@@ -558,8 +582,9 @@ function BookingScreen() {
                     createOrder={createPaypalOrder}
                     onApprove={handleApprove}
                     onError={handlePaypalError}
+                    onCancel={handlePaypalCancel}
                     forceReRender={[service.price, service.service_name, paidFor]}
-                    disabled={isProcessingPayment}
+                    disabled={isProcessingPayment || !hasValidAmount}
                   />
                 </PayPalScriptProvider>
                 {paypalError && <p className="bk-paypal-error">{paypalError}</p>}
