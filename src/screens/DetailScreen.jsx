@@ -1,4 +1,5 @@
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./DetailScreen.css";
 
 function DetailScreen() {
@@ -6,6 +7,16 @@ function DetailScreen() {
   const { id } = useParams();
   const location = useLocation();
   const service = location.state?.service;
+  const { isAuthenticated } = useAuth();
+
+  const handleBookService = () => {
+    if (!isAuthenticated) {
+      navigate("/signin");
+    } else {
+      alert(`Service "${service.service_name}" booked successfully!`);
+      // Add actual booking logic here
+    }
+  };
 
   if (!service) {
     return (
@@ -62,7 +73,9 @@ function DetailScreen() {
             </div>
           </div>
 
-          <button className="cta-button">Book Service</button>
+          <button className="cta-button" onClick={handleBookService}>
+            Book Service
+          </button>
         </div>
       </article>
     </main>
