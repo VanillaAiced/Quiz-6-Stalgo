@@ -55,6 +55,8 @@ export function AuthProvider({ children }) {
       ...userData, 
       role: "user",
       userId: `user_${Date.now()}`,
+      id: `user_${Date.now()}`,
+      joinDate: new Date().toISOString(),
     };
     setUser(newUser);
     setIsAuthenticated(true);

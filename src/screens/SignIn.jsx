@@ -39,15 +39,20 @@ function SignIn() {
 
     try {
       console.log("Signing in with:", formData);
-      // Replace with actual API call
-      // const response = await fetch('/api/signin', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
+      
+      // Get stored users from localStorage
+      const storedUsers = JSON.parse(localStorage.getItem("allUsers")) || [];
+      const foundUser = storedUsers.find((u) => u.email === formData.email);
 
+      if (!foundUser) {
+        setError("Email not found. Please sign up first.");
+        setLoading(false);
+        return;
+      }
+
+      // For now, accept any password (replace with real auth later)
       setTimeout(() => {
-        login({ email: formData.email });
+        login(foundUser);
         setLoading(false);
         navigate("/");
       }, 1000);
