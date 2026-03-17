@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./BookingScreen.css";
 
 const STEPS = ["Location", "Unit Details", "Date & Time", "Contact Details"];
@@ -37,9 +38,12 @@ const TODAY = new Date().toISOString().split("T")[0];
 function BookingScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   const service = location.state?.service;
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [formData, setFormData] = useState({
     city: "",
     propertyType: "",
@@ -102,14 +106,70 @@ function BookingScreen() {
     if (currentStep < STEPS.length - 1) {
       setCurrentStep((s) => s + 1);
     } else {
-      alert(`Booking confirmed for "${service.service_name}"! Our team will contact you shortly.`);
-      navigate("/");
+      // Show payment modal instead of alerting
+      setShowPaymentModal(true);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) setCurrentStep((s) => s - 1);
     else navigate(-1);
+  };
+
+  // Handle PayPal payment
+  const handlePayment = async () => {
+    setIsProcessingPayment(true);
+    try {
+      // Simulate PayPal payment processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Create booking record with PayPal transaction details
+      const booking = {
+        bookingId: `BK_${Date.now()}`,
+        // ── PayPal Transaction Fields ──
+        paypalOrderDescription: service.service_name, // e.g., "AC Repair"
+        amount: service.price,
+        currency: "USD",
+        merchantId: "MERCHANT_PLATFORM", // Platform merchant account
+        sellerMerchantId: service.merchant_id || "SELLER_PENDING", // Seller's assigned merchant ID
+        sellerName: service.name_of_the_expert,
+        // ── Booking Details ──
+        serviceName: service.service_name,
+        servicePrice: service.price,
+        serviceExpert: service.name_of_the_expert,
+        customerName: formData.fullName,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        customerAddress: formData.address,
+        location: formData.city,
+        propertyType: formData.propertyType,
+        brand: formData.brand,
+        model: formData.model,
+        issueDescription: formData.issueDescription,
+        preferredDate: formData.preferredDate,
+        timeSlot: formData.timeSlot,
+        // ── Payment Status ──
+        paymentStatus: "completed",
+        transactionId: `TXN_${Date.now()}`,
+        invoiceNumber: `INV_${Date.now()}`,
+        bookingDate: new Date().toISOString(),
+      };
+
+      // Store transaction in localStorage (simulating platform monitoring)
+      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+      transactions.push(booking);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+
+      setIsProcessingPayment(false);
+      alert(
+        `Payment successful! Booking ID: ${booking.bookingId}\n\nPayment of $${service.price} has been sent to the service expert's PayPal account.`
+      );
+      setShowPaymentModal(false);
+      navigate("/");
+    } catch (err) {
+      setIsProcessingPayment(false);
+      alert("Payment failed. Please try again.");
+    }
   };
 
   return (
@@ -385,6 +445,76 @@ function BookingScreen() {
           </div>
         </aside>
       </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="bk-modal-overlay">
+          <div className="bk-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="bk-modal-header">
+              <h2>Complete Payment</h2>
+              <button
+                className="bk-modal-close"
+                onClick={() => setShowPaymentModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="bk-modal-body">
+              <div className="bk-payment-info">
+                <p className="bk-payment-label">Service</p>
+                <p className="bk-payment-value">{service.service_name}</p>
+              </div>
+
+              <div className="bk-payment-info">
+                <p className="bk-payment-label">Amount</p>
+                <p className="bk-payment-value bk-payment-amount">${service.price}</p>
+              </div>
+
+              <div className="bk-payment-info">
+                <p className="bk-payment-label">Service Expert</p>
+                <p className="bk-payment-value">{service.name_of_the_expert}</p>
+              </div>
+
+              <div className="bk-payment-warning">
+                <span className="bk-warning-icon">ℹ</span>
+                <span>
+                  This payment will be sent directly to the service expert's PayPal
+                  account. Your platform account will track this transaction for
+                  monitoring purposes.
+                </span>
+              </div>
+
+              <div className="bk-payment-method">
+                <div className="bk-method-card bk-method-paypal">
+                  <span className="bk-method-icon">PayPal</span>
+                  <span className="bk-method-desc">Pay securely with PayPal</span>
+                </div>
+              </div>
+
+              <p className="bk-payment-disclaimer">
+                By proceeding, you agree to pay via PayPal. A confirmation email will
+                be sent to {formData.email || "your email"}.
+              </p>
+            </div>
+            <div className="bk-modal-actions">
+              <button
+                className="bk-modal-btn bk-modal-btn--cancel"
+                onClick={() => setShowPaymentModal(false)}
+                disabled={isProcessingPayment}
+              >
+                Cancel
+              </button>
+              <button
+                className="bk-modal-btn bk-modal-btn--pay"
+                onClick={handlePayment}
+                disabled={isProcessingPayment}
+              >
+                {isProcessingPayment ? "Processing..." : `Pay $${service.price}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
