@@ -122,6 +122,27 @@ function Navbar() {
         <div className="nav-auth">
           {isAuthenticated ? (
             <>
+              {user?.role === "user" && (
+                <>
+                  <Link to="/profile" className="nav-link nav-link--profile">
+                    My Profile
+                  </Link>
+                  <Link to="/subscriptions" className="nav-link nav-link--subscriptions">
+                    Plans
+                  </Link>
+                  <Link to="/apply-seller" className="nav-link nav-link--seller">
+                    Become a Seller
+                  </Link>
+                </>
+              )}
+              {user?.role === "seller" && (
+                <>
+                  <Link to="/seller-dashboard" className="nav-link nav-link--seller-dash">
+                    My Services
+                  </Link>
+                  <span className="nav-link role-badge role-badge--seller">Seller</span>
+                </>
+              )}
               {user?.role === "admin" && (
                 <>
                   <Link to="/admin-dashboard" className="nav-link nav-link--admin">
@@ -130,18 +151,11 @@ function Navbar() {
                   <Link to="/paypal-transactions" className="nav-link nav-link--paypal">
                     Transactions
                   </Link>
+                  <Link to="/subscription-list" className="nav-link nav-link--subscriptions-admin">
+                    Subscriptions
+                  </Link>
+                  <span className="nav-link role-badge role-badge--admin">Admin</span>
                 </>
-              )}
-              {user?.role === "user" && (
-                <Link to="/apply-seller" className="nav-link nav-link--seller">
-                  Become a Seller
-                </Link>
-              )}
-              {user?.role === "seller" && (
-                <span className="nav-link role-badge role-badge--seller">Seller</span>
-              )}
-              {user?.role === "admin" && (
-                <span className="nav-link role-badge role-badge--admin">Admin</span>
               )}
               <span className="nav-link user-text">{user?.first_name || "Logged In"}</span>
               <button onClick={handleLogout} className="nav-link logout-btn">

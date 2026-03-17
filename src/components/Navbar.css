@@ -254,6 +254,70 @@
   border: 1px solid #f5b7b1;
 }
 
+.nav-link--profile {
+  background: linear-gradient(135deg, #2f80ed, #1a6fd4);
+  color: #fff !important;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.nav-link--profile:hover {
+  opacity: 0.9;
+  box-shadow: 0 3px 10px rgba(47, 128, 237, 0.4);
+}
+
+.nav-link--subscriptions {
+  background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+  color: #fff !important;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.nav-link--subscriptions:hover {
+  opacity: 0.9;
+  box-shadow: 0 3px 10px rgba(156, 39, 176, 0.4);
+}
+
+.nav-link--seller-dash {
+  background: linear-gradient(135deg, #16a085, #138d75);
+  color: #fff !important;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.nav-link--seller-dash:hover {
+  opacity: 0.9;
+  box-shadow: 0 3px 10px rgba(22, 160, 133, 0.4);
+}
+
+.nav-link--subscriptions-admin {
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  color: #fff !important;
+  padding: 7px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 150ms ease, box-shadow 150ms ease;
+}
+
+.nav-link--subscriptions-admin:hover {
+  opacity: 0.9;
+  box-shadow: 0 3px 10px rgba(211, 47, 47, 0.4);
+}
+
 @media (max-width: 768px) {
   .navbar-container {
     padding: 0 15px;
