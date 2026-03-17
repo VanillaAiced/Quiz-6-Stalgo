@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { PayPalButtons, PayPalScriptProvider } from "@paypal/react-paypal-js";
 import { useAuth } from "../context/AuthContext";
 import "./BookingScreen.css";
 
@@ -40,10 +41,14 @@ function BookingScreen() {
   const location = useLocation();
   const { user } = useAuth();
   const service = location.state?.service;
+  const paypalClientId = process.env.REACT_APP_PAYPAL_CLIENT_ID || "sb";
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
 
   const [currentStep, setCurrentStep] = useState(0);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paidFor, setPaidFor] = useState(false);
+  const [paypalError, setPaypalError] = useState("");
   const [formData, setFormData] = useState({
     city: "",
     propertyType: "",
@@ -116,60 +121,109 @@ function BookingScreen() {
     else navigate(-1);
   };
 
-  // Handle PayPal payment
-  const handlePayment = async () => {
-    setIsProcessingPayment(true);
+  const getAccessToken = () => {
+    return (
+      localStorage.getItem("access") ||
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token") ||
+      ""
+    );
+  };
+
+  const createOrderRecord = async (paypalTransactionId, paypalDetails) => {
+    const booking = {
+      bookingId: `BK_${Date.now()}`,
+      paypalOrderDescription: service.service_name,
+      amount: Number(service.price),
+      currency: "USD",
+      merchantId: "MERCHANT_PLATFORM",
+      sellerMerchantId: service.merchant_id || "SELLER_PENDING",
+      sellerName: service.name_of_the_expert,
+      serviceId: service.id,
+      serviceName: service.service_name,
+      servicePrice: Number(service.price),
+      serviceExpert: service.name_of_the_expert,
+      customerName: formData.fullName || user?.name || user?.username || "",
+      customerEmail: formData.email || user?.email || "",
+      customerPhone: formData.phone,
+      customerAddress: formData.address,
+      location: formData.city,
+      propertyType: formData.propertyType,
+      brand: formData.brand,
+      model: formData.model,
+      issueDescription: formData.issueDescription,
+      preferredDate: formData.preferredDate,
+      timeSlot: formData.timeSlot,
+      paymentStatus: "completed",
+      transactionId: paypalTransactionId,
+      invoiceNumber: paypalDetails?.purchase_units?.[0]?.invoice_id || `INV_${Date.now()}`,
+      bookingDate: new Date().toISOString(),
+    };
+
+    const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
+    transactions.push(booking);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      return;
+    }
+
     try {
-      // Simulate PayPal payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await fetch(`${apiBaseUrl}/api/v1/orders/create/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          service: service.id,
+          paypal_transaction_id: paypalTransactionId,
+          price_paid: Number(service.price),
+        }),
+      });
+    } catch (error) {
+      console.error("Order API write failed, kept local record.", error);
+    }
+  };
 
-      // Create booking record with PayPal transaction details
-      const booking = {
-        bookingId: `BK_${Date.now()}`,
-        // ── PayPal Transaction Fields ──
-        paypalOrderDescription: service.service_name, // e.g., "AC Repair"
-        amount: service.price,
-        currency: "USD",
-        merchantId: "MERCHANT_PLATFORM", // Platform merchant account
-        sellerMerchantId: service.merchant_id || "SELLER_PENDING", // Seller's assigned merchant ID
-        sellerName: service.name_of_the_expert,
-        // ── Booking Details ──
-        serviceName: service.service_name,
-        servicePrice: service.price,
-        serviceExpert: service.name_of_the_expert,
-        customerName: formData.fullName,
-        customerEmail: formData.email,
-        customerPhone: formData.phone,
-        customerAddress: formData.address,
-        location: formData.city,
-        propertyType: formData.propertyType,
-        brand: formData.brand,
-        model: formData.model,
-        issueDescription: formData.issueDescription,
-        preferredDate: formData.preferredDate,
-        timeSlot: formData.timeSlot,
-        // ── Payment Status ──
-        paymentStatus: "completed",
-        transactionId: `TXN_${Date.now()}`,
-        invoiceNumber: `INV_${Date.now()}`,
-        bookingDate: new Date().toISOString(),
-      };
+  const handleApprove = async (data, actions) => {
+    try {
+      setIsProcessingPayment(true);
+      setPaypalError("");
+      const details = await actions.order.capture();
+      const paypalTransactionId = details?.id || data?.orderID || `TXN_${Date.now()}`;
 
-      // Store transaction in localStorage (simulating platform monitoring)
-      const transactions = JSON.parse(localStorage.getItem("transactions") || "[]");
-      transactions.push(booking);
-      localStorage.setItem("transactions", JSON.stringify(transactions));
+      await createOrderRecord(paypalTransactionId, details);
 
-      setIsProcessingPayment(false);
-      alert(
-        `Payment successful! Booking ID: ${booking.bookingId}\n\nPayment of $${service.price} has been sent to the service expert's PayPal account.`
-      );
+      setPaidFor(true);
+      alert(`Payment successful! Transaction ID: ${paypalTransactionId}`);
       setShowPaymentModal(false);
       navigate("/");
-    } catch (err) {
+    } catch (error) {
+      setPaypalError("Payment capture failed. Please try again.");
+    } finally {
       setIsProcessingPayment(false);
-      alert("Payment failed. Please try again.");
     }
+  };
+
+  const createPaypalOrder = (data, actions) => {
+    return actions.order.create({
+      purchase_units: [
+        {
+          description: service.service_name,
+          amount: {
+            currency_code: "USD",
+            value: Number(service.price).toFixed(2),
+          },
+        },
+      ],
+    });
+  };
+
+  const handlePaypalError = () => {
+    setPaypalError("PayPal could not be initialized. Check your client ID and try again.");
+    setIsProcessingPayment(false);
   };
 
   return (
@@ -491,6 +545,26 @@ function BookingScreen() {
                 </div>
               </div>
 
+              <div className="bk-paypal-container">
+                <PayPalScriptProvider
+                  options={{
+                    "client-id": paypalClientId,
+                    currency: "USD",
+                    intent: "capture",
+                  }}
+                >
+                  <PayPalButtons
+                    style={{ layout: "vertical" }}
+                    createOrder={createPaypalOrder}
+                    onApprove={handleApprove}
+                    onError={handlePaypalError}
+                    forceReRender={[service.price, service.service_name, paidFor]}
+                    disabled={isProcessingPayment}
+                  />
+                </PayPalScriptProvider>
+                {paypalError && <p className="bk-paypal-error">{paypalError}</p>}
+              </div>
+
               <p className="bk-payment-disclaimer">
                 By proceeding, you agree to pay via PayPal. A confirmation email will
                 be sent to {formData.email || "your email"}.
@@ -503,13 +577,6 @@ function BookingScreen() {
                 disabled={isProcessingPayment}
               >
                 Cancel
-              </button>
-              <button
-                className="bk-modal-btn bk-modal-btn--pay"
-                onClick={handlePayment}
-                disabled={isProcessingPayment}
-              >
-                {isProcessingPayment ? "Processing..." : `Pay $${service.price}`}
               </button>
             </div>
           </div>

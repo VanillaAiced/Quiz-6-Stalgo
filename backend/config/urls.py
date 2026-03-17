@@ -18,6 +18,13 @@ urlpatterns = [
     path('api/payments/', include('apps.payments.urls', namespace='payments')),
     path('api/subscriptions/', include('apps.subscriptions.urls', namespace='subscriptions')),
     path('api/applications/', include('apps.applications.urls', namespace='applications')),
+
+    # API v1 base routes
+    path('api/v1/users/', include('apps.users.urls', namespace='users-v1')),
+    path('api/v1/applications/', include('apps.applications.urls', namespace='applications-v1')),
+    path('api/v1/services/', include('apps.services.urls', namespace='services-v1')),
+    path('api/v1/orders/', include('apps.orders.urls', namespace='orders-v1')),
+    path('api/v1/chat/', include('apps.chat.urls', namespace='chat-v1')),
 ]
 
 # Serve media files in development

@@ -2,15 +2,14 @@
 URLs for subscriptions
 """
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from apps.payments.views import SubscriptionViewSet
+from django.urls import path
+
+from .views import SubscriptionTierListView, UserSubscriptionView, MyActiveSubscriptionView
 
 app_name = 'subscriptions'
 
-router = DefaultRouter()
-router.register(r'', SubscriptionViewSet, basename='subscription')
-
 urlpatterns = [
-    path('', include(router.urls)),
+    path('tiers/', SubscriptionTierListView.as_view(), name='tiers'),
+    path('my/', MyActiveSubscriptionView.as_view(), name='my-subscription'),
+    path('', UserSubscriptionView.as_view(), name='subscription-list-create'),
 ]

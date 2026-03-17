@@ -48,6 +48,7 @@ const CHATBOT_KNOWLEDGE = {
 };
 
 function ChatBot() {
+  const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://127.0.0.1:8000";
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -59,6 +60,7 @@ function ChatBot() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [usageLeft, setUsageLeft] = useState(null);
 
   // Match user input to knowledge base
   const findAnswer = (userInput) => {
@@ -73,15 +75,49 @@ function ChatBot() {
     return CHATBOT_KNOWLEDGE.default;
   };
 
+  const getAccessToken = () => {
+    return (
+      localStorage.getItem("access") ||
+      localStorage.getItem("accessToken") ||
+      localStorage.getItem("token") ||
+      ""
+    );
+  };
+
+  const askBackend = async (message) => {
+    const token = getAccessToken();
+    const headers = {
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/v1/chat/ask/`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ message }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Chat request failed.");
+    }
+
+    return data;
+  };
+
   // Handle sending a message
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
+    const messageText = inputValue.trim();
 
     // Add user message
     const userMessage = {
       id: messages.length + 1,
-      text: inputValue,
+      text: messageText,
       isBot: false,
       timestamp: new Date(),
     };
@@ -90,17 +126,33 @@ function ChatBot() {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot thinking and response
-    setTimeout(() => {
+    try {
+      const data = await askBackend(messageText);
+      const text = data.response || data.reply || findAnswer(messageText);
+      if (typeof data.usage_left === "number") {
+        setUsageLeft(data.usage_left);
+      }
+
       const botResponse = {
         id: messages.length + 2,
-        text: findAnswer(inputValue),
+        text,
         isBot: true,
         timestamp: new Date(),
       };
+
       setMessages((prev) => [...prev, botResponse]);
+    } catch (error) {
+      const fallbackResponse = {
+        id: messages.length + 2,
+        text: `${error.message} ${findAnswer(messageText)}`,
+        isBot: true,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, fallbackResponse]);
+    } finally {
       setIsTyping(false);
-    }, 800);
+    }
   };
 
   if (!isOpen) {
@@ -119,6 +171,7 @@ function ChatBot() {
     <div className="chatbot-container">
       <div className="chatbot-header">
         <h3 className="chatbot-title">Platform Assistant</h3>
+        {usageLeft !== null && <small>Usage left: {usageLeft}</small>}
         <button className="chatbot-close" onClick={() => setIsOpen(false)}>
           ✕
         </button>

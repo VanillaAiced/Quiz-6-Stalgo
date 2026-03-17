@@ -2,16 +2,19 @@
 URLs for services
 """
 
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import ServiceViewSet, ServiceReviewViewSet
+from django.urls import path
+from .views import (
+    ServiceListView,
+    ServiceDetailView,
+    SellerServiceManageView,
+    SellerServiceDetailView,
+)
 
 app_name = 'services'
 
-router = DefaultRouter()
-router.register(r'', ServiceViewSet, basename='service')
-router.register(r'reviews', ServiceReviewViewSet, basename='service-review')
-
 urlpatterns = [
-    path('', include(router.urls)),
+    path('list/', ServiceListView.as_view(), name='list'),
+    path('<int:pk>/', ServiceDetailView.as_view(), name='detail'),
+    path('manage/', SellerServiceManageView.as_view(), name='manage'),
+    path('manage/<int:pk>/', SellerServiceDetailView.as_view(), name='manage-detail'),
 ]

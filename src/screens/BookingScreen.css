@@ -414,6 +414,17 @@
   margin-bottom: 20px;
 }
 
+.bk-paypal-container {
+  margin-bottom: 20px;
+}
+
+.bk-paypal-error {
+  margin-top: 10px;
+  color: #e53e3e;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
 .bk-method-card {
   display: flex;
   align-items: center;

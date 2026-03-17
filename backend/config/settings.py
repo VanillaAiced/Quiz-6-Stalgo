@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'apps.payments.apps.PaymentsConfig',
     'apps.subscriptions.apps.SubscriptionsConfig',
     'apps.applications.apps.ApplicationsConfig',
+    'apps.orders.apps.OrdersConfig',
+    'apps.chat.apps.ChatConfig',
 ]
 
 MIDDLEWARE = [
