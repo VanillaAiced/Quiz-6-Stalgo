@@ -7,6 +7,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UserRegistrationView,
     UserLoginView,
+    TokenRefreshView,
     UserViewSet,
     SellerApplicationViewSet
 )
@@ -20,5 +21,6 @@ router.register(r'seller-applications', SellerApplicationViewSet, basename='sell
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
+    path('token-refresh/', TokenRefreshView.as_view(), name='token-refresh'),
     path('', include(router.urls)),
 ]

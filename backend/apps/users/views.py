@@ -7,6 +7,7 @@ from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 
 from .models import CustomUser, SellerApplication
@@ -23,10 +24,24 @@ class UserRegistrationView(generics.CreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [AllowAny]
+    
+    def create(self, request, *args, **kwargs):
+        """Create user and return JWT tokens"""
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED:
+            user = CustomUser.objects.get(email=response.data['email'])
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user': response.data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'message': 'User registered successfully'
+            }, status=status.HTTP_201_CREATED)
+        return response
 
 
 class UserLoginView(generics.GenericAPIView):
-    """View for user login"""
+    """View for user login with JWT tokens"""
     serializer_class = UserLoginSerializer
     permission_classes = [AllowAny]
     
@@ -59,15 +74,53 @@ class UserLoginView(generics.GenericAPIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
         
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        
         return Response({
-            'id': user.id,
-            'username': user.username,
-            'email': user.email,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'role': user.role,
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'phone_number': user.phone_number,
+                'location': user.location,
+                'gender': user.gender,
+                'role': user.role,
+                'merchant_id': user.merchant_id,
+            },
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
             'message': 'Login successful'
         }, status=status.HTTP_200_OK)
+
+
+class TokenRefreshView(generics.GenericAPIView):
+    """View to refresh JWT access token"""
+    permission_classes = [AllowAny]
+    
+    def post(self, request, *args, **kwargs):
+        """Refresh access token using refresh token"""
+        refresh_token = request.data.get('refresh')
+        
+        if not refresh_token:
+            return Response(
+                {'error': 'Refresh token is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            refresh = RefreshToken(refresh_token)
+            return Response({
+                'access': str(refresh.access_token),
+                'message': 'Token refreshed successfully'
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
 
 class UserViewSet(viewsets.ModelViewSet):
