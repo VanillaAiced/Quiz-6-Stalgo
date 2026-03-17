@@ -3,6 +3,7 @@ Serializers for User models
 """
 
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import CustomUser, SellerApplication
 
 
@@ -19,7 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at', 'updated_at', 'merchant_id']
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     """Serializer for user registration"""
     
     password = serializers.CharField(write_only=True, min_length=6)
@@ -46,8 +47,19 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserLoginSerializer(serializers.Serializer):
-    """Serializer for user login"""
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Custom JWT token serializer with additional user info"""
+    
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        
+        # Add custom claims
+        token['username'] = user.username
+        token['email'] = user.email
+        token['role'] = user.role
+        
+        return token
     
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)

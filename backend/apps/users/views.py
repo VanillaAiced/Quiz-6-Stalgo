@@ -7,22 +7,28 @@ from rest_framework import viewsets, status, generics
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import CustomUser, SellerApplication
 from .serializers import (
     UserSerializer,
-    UserRegistrationSerializer,
-    UserLoginSerializer,
+    RegisterSerializer,
+    MyTokenObtainPairSerializer,
     SellerApplicationSerializer
 )
 
 
-class UserRegistrationView(generics.CreateAPIView):
+class MyTokenObtainPairView(TokenObtainPairView):
+    """Custom login view that returns JWT token pair"""
+    serializer_class = MyTokenObtainPairSerializer
+
+
+class RegisterView(generics.CreateAPIView):
     """View for user registration"""
     queryset = CustomUser.objects.all()
-    serializer_class = UserRegistrationSerializer
+    serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
     
     def create(self, request, *args, **kwargs):
@@ -40,87 +46,24 @@ class UserRegistrationView(generics.CreateAPIView):
         return response
 
 
-class UserLoginView(generics.GenericAPIView):
-    """View for user login with JWT tokens"""
-    serializer_class = UserLoginSerializer
-    permission_classes = [AllowAny]
-    
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        user = authenticate(
-            username=serializer.validated_data['email'],
-            password=serializer.validated_data['password']
-        )
-        
-        if user is None:
-            # Try with email as username
-            try:
-                user_obj = CustomUser.objects.get(email=serializer.validated_data['email'])
-                user = authenticate(
-                    username=user_obj.username,
-                    password=serializer.validated_data['password']
-                )
-            except CustomUser.DoesNotExist:
-                return Response(
-                    {'error': 'Invalid credentials'},
-                    status=status.HTTP_401_UNAUTHORIZED
-                )
-        
-        if user is None:
-            return Response(
-                {'error': 'Invalid credentials'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'phone_number': user.phone_number,
-                'location': user.location,
-                'gender': user.gender,
-                'role': user.role,
-                'merchant_id': user.merchant_id,
-            },
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-            'message': 'Login successful'
-        }, status=status.HTTP_200_OK)
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    """View for retrieving and updating current authenticated user's profile"""
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
 
 
-class TokenRefreshView(generics.GenericAPIView):
-    """View to refresh JWT access token"""
-    permission_classes = [AllowAny]
-    
-    def post(self, request, *args, **kwargs):
-        """Refresh access token using refresh token"""
-        refresh_token = request.data.get('refresh')
-        
-        if not refresh_token:
-            return Response(
-                {'error': 'Refresh token is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            refresh = RefreshToken(refresh_token)
-            return Response({
-                'access': str(refresh.access_token),
-                'message': 'Token refreshed successfully'
-            }, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
+class AdminUserListView(generics.ListAPIView):
+    """Admin-only view for listing all users"""
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role != 'admin':
+            raise PermissionDenied('You do not have permission to view all users.')
+        return CustomUser.objects.all()
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -232,5 +175,3 @@ class SellerApplicationViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(app)
         return Response(serializer.data)
 
-
-from django.utils.timezone import now
