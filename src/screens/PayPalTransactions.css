@@ -1,0 +1,286 @@
+/* ── Page Shell ── */
+.paypal-screen {
+  min-height: 100vh;
+  background: #f5f8fc;
+  padding: 40px 24px 80px;
+  box-sizing: border-box;
+}
+
+/* ── Gate (non-admin) ── */
+.paypal-gate {
+  max-width: 520px;
+  margin: 80px auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 48px 40px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(37, 71, 109, 0.10);
+}
+
+.paypal-gate-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1c2b3a;
+  margin: 0 0 8px;
+}
+
+.paypal-gate-text {
+  font-size: 0.95rem;
+  color: #5d6e80;
+  margin: 0;
+}
+
+/* ── Container ── */
+.paypal-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.paypal-header {
+  margin-bottom: 32px;
+}
+
+.paypal-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1c2b3a;
+  margin: 0 0 6px;
+}
+
+.paypal-subtitle {
+  font-size: 0.9rem;
+  color: #5d6e80;
+  margin: 0;
+}
+
+/* ── Stats Cards ── */
+.paypal-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #003087 0%, #1434cb 100%);
+  color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0, 48, 135, 0.15);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* ── Table ── */
+.paypal-empty {
+  background: #fff;
+  border-radius: 12px;
+  padding: 80px 24px;
+  text-align: center;
+  color: #9aa6b0;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 18px rgba(37, 71, 109, 0.08);
+}
+
+.paypal-table-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(37, 71, 109, 0.08);
+  margin-bottom: 32px;
+  overflow-x: auto;
+}
+
+.paypal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.paypal-table thead {
+  background: linear-gradient(135deg, #003087 0%, #1434cb 100%);
+  color: #fff;
+}
+
+.paypal-table th {
+  padding: 14px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.paypal-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f0f4f8;
+  color: #1c2b3a;
+}
+
+.paypal-table tbody tr:hover {
+  background: #f9fbfd;
+}
+
+.paypal-txn-id {
+  font-family: "Monaco", "Courier New", monospace;
+  color: #2f80ed;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.paypal-invoice {
+  font-family: "Monaco", "Courier New", monospace;
+  background: #f0f4f8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+.paypal-description {
+  color: #2f80ed;
+  font-weight: 600;
+}
+
+.paypal-amount {
+  font-weight: 700;
+  color: #27ae60;
+  font-size: 0.95rem;
+}
+
+.paypal-merchant {
+  font-family: "Monaco", "Courier New", monospace;
+  background: #f5e6ff;
+  color: #7928ca;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.paypal-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.paypal-status--completed {
+  background: #e6f9f0;
+  color: #27ae60;
+  border: 1px solid #a3e0c0;
+}
+
+/* ── Info Box ── */
+.paypal-info-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 18px rgba(37, 71, 109, 0.08);
+  border-left: 5px solid #003087;
+}
+
+.paypal-info-box h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1c2b3a;
+  margin: 0 0 18px;
+}
+
+.paypal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #9aa6b0;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: #1c2b3a;
+  font-family: "Monaco", "Courier New", monospace;
+  background: #f5f8fc;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.paypal-note {
+  font-size: 0.85rem;
+  color: #5d6e80;
+  margin: 0;
+  line-height: 1.5;
+  padding: 12px;
+  background: #e8f0fe;
+  border-radius: 6px;
+  border-left: 3px solid #003087;
+}
+
+/* ── Buttons ── */
+.paypal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 150ms ease, box-shadow 150ms ease;
+}
+
+.paypal-btn--primary {
+  background: linear-gradient(135deg, #003087 0%, #1434cb 100%);
+  color: #fff;
+}
+
+.paypal-btn--primary:hover {
+  box-shadow: 0 4px 14px rgba(0, 48, 135, 0.35);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .paypal-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .paypal-table {
+    font-size: 0.75rem;
+  }
+
+  .paypal-table th,
+  .paypal-table td {
+    padding: 8px 10px;
+  }
+
+  .paypal-info-grid {
+    grid-template-columns: 1fr;
+  }
+}

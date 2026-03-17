@@ -122,6 +122,16 @@ function Navbar() {
         <div className="nav-auth">
           {isAuthenticated ? (
             <>
+              {user?.role === "admin" && (
+                <>
+                  <Link to="/admin-dashboard" className="nav-link nav-link--admin">
+                    Admin Dashboard
+                  </Link>
+                  <Link to="/paypal-transactions" className="nav-link nav-link--paypal">
+                    Transactions
+                  </Link>
+                </>
+              )}
               {user?.role === "user" && (
                 <Link to="/apply-seller" className="nav-link nav-link--seller">
                   Become a Seller

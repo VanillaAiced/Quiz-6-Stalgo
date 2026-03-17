@@ -1,0 +1,426 @@
+/* ── Seller Dashboard Container ── */
+.seller-dashboard {
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(135deg, #f5f8fc 0%, #f0f4f8 100%);
+  padding: 40px 20px;
+}
+
+.seller-dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Header Section ── */
+.seller-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 40px;
+  gap: 20px;
+}
+
+.seller-dashboard-header h1 {
+  font-size: 2.5rem;
+  color: #1c2b3a;
+  margin: 0;
+  font-weight: 700;
+}
+
+.seller-subtitle {
+  color: #7a97ae;
+  font-size: 1rem;
+  margin: 8px 0 0 0;
+}
+
+/* ── Buttons ── */
+.btn-add-service {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #2f80ed, #1a6fd4);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  white-space: nowrap;
+}
+
+.btn-add-service:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(47, 128, 237, 0.3);
+}
+
+.btn-add-service-large {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #2f80ed, #1a6fd4);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-add-service-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(47, 128, 237, 0.3);
+}
+
+/* ── Success Message ── */
+.success-message {
+  padding: 16px 20px;
+  background: #e8f5e9;
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  color: #2e7d32;
+  margin-bottom: 24px;
+  font-weight: 500;
+  animation: slideIn 300ms ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── Form Section ── */
+.seller-form-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(37, 71, 109, 0.08);
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f4f8;
+}
+
+.form-header h2 {
+  font-size: 1.5rem;
+  color: #1c2b3a;
+  margin: 0;
+}
+
+.btn-close-form {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #7a97ae;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 150ms ease;
+}
+
+.btn-close-form:hover {
+  color: #2f80ed;
+}
+
+/* ── Form Groups ── */
+.seller-service-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1c2b3a;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 12px 14px;
+  border: 1px solid #dce6f3;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2f80ed;
+  box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.1);
+}
+
+.form-group input.input-error,
+.form-group textarea.input-error {
+  border-color: #f44336;
+}
+
+.error-message {
+  font-size: 0.8rem;
+  color: #f44336;
+  font-weight: 500;
+}
+
+/* ── Form Actions ── */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.btn-submit,
+.btn-cancel {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #2f80ed, #1a6fd4);
+  color: #fff;
+}
+
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(47, 128, 237, 0.3);
+}
+
+.btn-cancel {
+  background: #f0f4f8;
+  color: #7a97ae;
+}
+
+.btn-cancel:hover {
+  background: #e0e8f0;
+}
+
+/* ── Services Section ── */
+.services-section {
+  margin-top: 40px;
+}
+
+.services-section h2 {
+  font-size: 1.5rem;
+  color: #1c2b3a;
+  margin-bottom: 24px;
+}
+
+/* ── No Services ── */
+.no-services {
+  text-align: center;
+  padding: 60px 40px;
+  background: #fff;
+  border-radius: 12px;
+  border: 2px dashed #dce6f3;
+}
+
+.no-services p {
+  color: #7a97ae;
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+/* ── Services Grid ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.service-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(37, 71, 109, 0.08);
+  transition: all 200ms ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(37, 71, 109, 0.12);
+}
+
+/* ── Service Image ── */
+.service-image {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: #f0f4f8;
+}
+
+.service-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.price-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, #2f80ed, #1a6fd4);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* ── Service Details ── */
+.service-details {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-details h3 {
+  font-size: 1.1rem;
+  color: #1c2b3a;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.description {
+  color: #7a97ae;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  flex-grow: 1;
+}
+
+/* ── Service Meta ── */
+.service-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.duration {
+  display: inline-flex;
+  align-items: center;
+  background: #f0f4f8;
+  color: #2f80ed;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ── Service Actions ── */
+.service-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-edit,
+.btn-delete {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-edit {
+  background: #e3f2fd;
+  color: #2f80ed;
+}
+
+.btn-edit:hover {
+  background: #bbdefb;
+}
+
+.btn-delete {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.btn-delete:hover {
+  background: #ffcdd2;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .seller-dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-add-service {
+    width: 100%;
+  }
+
+  .seller-dashboard-header h1 {
+    font-size: 2rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .services-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .seller-form-section {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .seller-dashboard {
+    padding: 20px 16px;
+  }
+
+  .seller-dashboard-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-submit,
+  .btn-cancel {
+    width: 100%;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .seller-form-section {
+    padding: 16px;
+  }
+}

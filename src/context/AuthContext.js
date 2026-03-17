@@ -8,6 +8,7 @@ export function AuthProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [sellerApplications, setSellerApplications] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
   // Load user and seller applications from localStorage
   useEffect(() => {
@@ -31,6 +32,15 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("sellerApplications");
       }
     }
+
+    const storedUsers = localStorage.getItem("allUsers");
+    if (storedUsers) {
+      try {
+        setAllUsers(JSON.parse(storedUsers));
+      } catch (err) {
+        localStorage.removeItem("allUsers");
+      }
+    }
   }, []);
 
   const login = (userData) => {
@@ -41,9 +51,18 @@ export function AuthProvider({ children }) {
 
   // Registration always creates a "user" role account
   const signup = (userData) => {
-    const newUser = { ...userData, role: "user" };
+    const newUser = { 
+      ...userData, 
+      role: "user",
+      userId: `user_${Date.now()}`,
+    };
     setUser(newUser);
     setIsAuthenticated(true);
+    
+    // Store in allUsers list
+    const updated = [...allUsers, newUser];
+    setAllUsers(updated);
+    localStorage.setItem("allUsers", JSON.stringify(updated));
     localStorage.setItem("user", JSON.stringify(newUser));
   };
 
@@ -61,8 +80,11 @@ export function AuthProvider({ children }) {
       ...applicationData,
       applicantEmail: user.email,
       applicantName: `${user.first_name} ${user.last_name}`,
+      userId: user.userId,
       status: "pending",
       submittedAt: new Date().toISOString(),
+      merchantId: null,
+      declineReason: null,
     };
     const updated = [...existing.filter((a) => a.applicantEmail !== user.email), newApplication];
     setSellerApplications(updated);
@@ -75,9 +97,58 @@ export function AuthProvider({ children }) {
     return sellerApplications.find((a) => a.applicantEmail === user.email) || null;
   };
 
+  // Admin: Approve a seller application
+  const approveSeller = (applicantEmail, merchantId) => {
+    // Update the application
+    const updated = sellerApplications.map((app) =>
+      app.applicantEmail === applicantEmail
+        ? { ...app, status: "approved", merchantId, declineReason: null }
+        : app
+    );
+    setSellerApplications(updated);
+    localStorage.setItem("sellerApplications", JSON.stringify(updated));
+
+    // Update the user's role to "seller"
+    const updatedUsers = allUsers.map((u) =>
+      u.email === applicantEmail ? { ...u, role: "seller", merchantId } : u
+    );
+    setAllUsers(updatedUsers);
+    localStorage.setItem("allUsers", JSON.stringify(updatedUsers));
+
+    // If current user was approved, update their session
+    if (user?.email === applicantEmail) {
+      const updatedUser = { ...user, role: "seller", merchantId };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
+
+  // Admin: Decline a seller application
+  const declineSeller = (applicantEmail, declineReason) => {
+    const updated = sellerApplications.map((app) =>
+      app.applicantEmail === applicantEmail
+        ? { ...app, status: "rejected", declineReason, merchantId: null }
+        : app
+    );
+    setSellerApplications(updated);
+    localStorage.setItem("sellerApplications", JSON.stringify(updated));
+  };
+
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, user, login, signup, logout, applyForSeller, getMySellerApplication, sellerApplications }}
+      value={{
+        isAuthenticated,
+        user,
+        login,
+        signup,
+        logout,
+        applyForSeller,
+        getMySellerApplication,
+        sellerApplications,
+        approveSeller,
+        declineSeller,
+        allUsers,
+      }}
     >
       {children}
     </AuthContext.Provider>
